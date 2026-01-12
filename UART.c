@@ -9,7 +9,7 @@
  */
 #include "UART.h"
 #include "init_var.h"
-#include "driverlib.h"
+//#include "driverlib.h"
 //#include <stdint.h>
 // Sensirion Constants:
 static const uint8_t UART_crc_polynomial = crc_polynomial; // 0x31 (x^8 + x^5 + x^4 + 1).
@@ -150,16 +150,16 @@ void UART_init()
     // Calculations for baud rate are from
     // https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSP430BaudRateConverter/index.html
 
-    EUSCI_A_UART_initParam param = {0};
-    param.selectClockSource = EUSCI_A_UART_CLOCKSOURCE_SMCLK;
-    param.clockPrescalar = 6; // 104;
-    param.firstModReg = 8;    // 2;
-    param.secondModReg = 17;  // 182;
-    param.parity = EUSCI_A_UART_NO_PARITY;
-    param.msborLsbFirst = EUSCI_A_UART_LSB_FIRST;
-    param.numberofStopBits = EUSCI_A_UART_ONE_STOP_BIT;
-    param.uartMode = EUSCI_A_UART_MODE;
-    param.overSampling = EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION;
+//    EUSCI_A_UART_initParam param = {0};
+//    param.selectClockSource = EUSCI_A_UART_CLOCKSOURCE_SMCLK;
+//    param.clockPrescalar = 6; // 104;
+//    param.firstModReg = 8;    // 2;
+//    param.secondModReg = 17;  // 182;
+//    param.parity = EUSCI_A_UART_NO_PARITY;
+//    param.msborLsbFirst = EUSCI_A_UART_LSB_FIRST;
+//    param.numberofStopBits = EUSCI_A_UART_ONE_STOP_BIT;
+//    param.uartMode = EUSCI_A_UART_MODE;
+//    param.overSampling = EUSCI_A_UART_OVERSAMPLING_BAUDRATE_GENERATION;
 
 #ifdef USE_UART_0
     if (STATUS_FAIL == EUSCI_A_UART_init(EUSCI_A0_BASE, &param))
@@ -168,11 +168,11 @@ void UART_init()
     }
     EUSCI_A_UART_enable(EUSCI_A0_BASE);
 #else
-    if (STATUS_FAIL == EUSCI_A_UART_init(EUSCI_A1_BASE, &param))
-    {
-        return;
-    }
-    EUSCI_A_UART_enable(EUSCI_A1_BASE);
+//    if (STATUS_FAIL == EUSCI_A_UART_init(EUSCI_A1_BASE, &param))
+//    {
+//        return;
+//    }
+//    EUSCI_A_UART_enable(EUSCI_A1_BASE);
 
 #endif
     __enable_interrupt();

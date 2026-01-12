@@ -197,8 +197,8 @@
 
 #define Set_WDT                 ERROR_VALUE = 39
 
-#define WDTPW  0X5A00  // PASSWORD THAT HAS TO BE PART OF ANY WRITE TO WATCHDOG
-#define WDTHOLD  0X0080  // SET BIT 7 TO HOLD WATCHDOG
+//#define WDTPW  0X5A00  // PASSWORD THAT HAS TO BE PART OF ANY WRITE TO WATCHDOG
+//#define WDTHOLD  0X0080  // SET BIT 7 TO HOLD WATCHDOG
 
 // ----------------------------------------------------------
 

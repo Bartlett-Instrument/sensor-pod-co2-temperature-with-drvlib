@@ -19,15 +19,15 @@
 #include <stdint.h>
 #include "main.h"
 #include "init_var.h"
-//#include <msp430.h>
+#include <msp430.h>
 #include "grlib.h"
 #include "LCD_driver/Template_Driver.h"
 #include "images/images.h"
-#include "driverlib.h"
+//#include "driverlib.h"
 #include "uart.h"
 #include "I2C.h"
 #include "timer.h"
-
+#include "hw_config.h"
 
 //#include "hw_config.h"
 Graphics_Context g_sContext;
@@ -113,8 +113,6 @@ static void handle_UART_CMD();
 
 void main(void)
 {
-    // Set up the LCD
-    WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
 
 uint8_t quarter_second_count = 0;
 
@@ -132,20 +130,21 @@ volatile uint16_t peak_CO2 = 0, trough_CO2 = 0;
 volatile uint8_t peak_RH = 0, trough_RH = 0;
 volatile uint8_t peak_T = 0, trough_T = 0;
 
-
+      WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
+      init_hardware();
      //General_GPIO_init();
     // I2C_GPIO_init();
    //  UART_GPIO_init();
    //  ledRGB_GPIO_init();
-     UCB1_I2C_init_master(Sensirion_Baud_Rate, Sensirion_Address); // SET UP FOR SCD30
+   //  UCB1_I2C_init_master(Sensirion_Baud_Rate, Sensirion_Address); // SET UP FOR SCD30
      timer_A_init();
 
-     main_init(PRODUCTION_AMBIENT_PRESSURE_MBAR_DEFAULT,
-               PRODUCTION_AUTOMATIC_SELF_CALIBRATION_DEFAULT,
-               (uint8_t)200,
-               PRODUCTION_ALTITUDE_COMPENSATION_DEFAULT,
-               (uint8_t)1272,
-               true);
+//     main_init(PRODUCTION_AMBIENT_PRESSURE_MBAR_DEFAULT,
+//               PRODUCTION_AUTOMATIC_SELF_CALIBRATION_DEFAULT,
+//               (uint8_t)200,
+//               PRODUCTION_ALTITUDE_COMPENSATION_DEFAULT,
+//               (uint8_t)1272,
+//               true);
 
      while (1)
      {
@@ -154,25 +153,24 @@ volatile uint8_t peak_T = 0, trough_T = 0;
          {
              Clr_New_50_ms;
              quarter_second_count++;
-        //     I2C_update_LED();
 
-
-             if (UART_TIME > UART_TIMEOUT)
-             {
-                 handle_UART_TIMEOUT();
-             }
-             if (I2C_TIME > I2C_TIMEOUT)
-             {
-                 handle_I2C_TIMEOUT();
-             }
-             if (I2C_REDUX_COUNT > 6)
-             {
-                 I2C_REDUX_COUNT = 1;
-                 Sensirion_soft_reset();
-                 // Caught by the default path of I2C switch, essentially a 250 ms wait time.
-                 SKIP_READ;
-             }
-             // TODO: Handle UART_REDUX_COUNT
+//
+//             if (UART_TIME > UART_TIMEOUT)
+//             {
+//                 handle_UART_TIMEOUT();
+//             }
+//             if (I2C_TIME > I2C_TIMEOUT)
+//             {
+//                 handle_I2C_TIMEOUT();
+//             }
+//             if (I2C_REDUX_COUNT > 6)
+//             {
+//                 I2C_REDUX_COUNT = 1;
+//                 Sensirion_soft_reset();
+//                 // Caught by the default path of I2C switch, essentially a 250 ms wait time.
+//                 SKIP_READ;
+//             }
+//             // TODO: Handle UART_REDUX_COUNT
          } // end new 50 ms
 
          // Every 250 ms (derived from 50_ms)
@@ -181,17 +179,17 @@ volatile uint8_t peak_T = 0, trough_T = 0;
              quarter_second_count = 0;
 
              // Parse RX if done receiving.
-             if (UART_PARSE_RX_FLG)
-             {
-                 UART_parse_RX_buffer();
-             }
-
-             // Start handle UART CMD. 0xF0 is CMD default reset state.
-             if (!CMD_IS_RESET)
-             {
-                 handle_UART_CMD();
-             } // End handle UART CMD
-
+//             if (UART_PARSE_RX_FLG)
+//             {
+//                 UART_parse_RX_buffer();
+//             }
+//
+//             // Start handle UART CMD. 0xF0 is CMD default reset state.
+//             if (!CMD_IS_RESET)
+//             {
+//                 handle_UART_CMD();
+//             } // End handle UART CMD
+//
 
              // Start get sensor READ
              // This switch() should take 1.5 seconds to loop back to case 0 plus polling time for data_ready.
@@ -259,17 +257,17 @@ volatile uint8_t peak_T = 0, trough_T = 0;
          {
              Clr_New_Ten_Second;
              // Allow read buffer to populate fully, else send 0s.
-             if (num_reads > I2C_Readings_Buffer_Size)
-             {
-                 // Update averages before sending.
-                 I2C_avg_readings(&CO2_avg, &T_avg, &RH_avg);
-
-                 CO2_MSB = (uint8_t)(CO2_avg >> One_Byte);
-                 CO2_LSB = (uint8_t)CO2_avg;
-                 TEMPERATURE = (uint8_t)T_avg;
-                 HUMIDITY = (uint8_t)RH_avg;
-                 UART_populate_TX_READ_buffer();
-             }
+//             if (num_reads > I2C_Readings_Buffer_Size)
+//             {
+//                 // Update averages before sending.
+//                 I2C_avg_readings(&CO2_avg, &T_avg, &RH_avg);
+//
+//                 CO2_MSB = (uint8_t)(CO2_avg >> One_Byte);
+//                 CO2_LSB = (uint8_t)CO2_avg;
+//                 TEMPERATURE = (uint8_t)T_avg;
+//                 HUMIDITY = (uint8_t)RH_avg;
+//                 UART_populate_TX_READ_buffer();
+//             }
 
 //             //TODO: Peak values are for debugging only.
 //             peak_tx = I2C_PEAK_TX_TIME;
@@ -300,7 +298,7 @@ volatile uint8_t peak_T = 0, trough_T = 0;
          if (New_Hour)
              Clr_New_Hour;
      } // End new hour
- }
+ }  // end while(1)
 
 
  /********************************************************************************************
